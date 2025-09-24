@@ -57,12 +57,13 @@ class Customer:
             cursor.close()
             connection.close()
     
-    def delete(self):
-        if self.customer_id:
+    @classmethod
+    def delete(cls, customer_id):
+        if customer_id:
             connection, cursor = connect_to_mysql()
             try:
                 query = "DELETE FROM customer WHERE customer_id = %s"
-                cursor.execute(query, (self.customer_id,))
+                cursor.execute(query, (customer_id,))
                 connection.commit()
             except Exception as e:
                 print(f"Error: {e}")

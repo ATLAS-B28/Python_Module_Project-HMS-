@@ -80,7 +80,8 @@ class Booking:
             cursor.close()
             connection.close()
     
-    def delete(self, booking_id):
+    @classmethod
+    def delete(cls, booking_id):
         if booking_id:
             connection, cursor = connect_to_mysql()
             try:
