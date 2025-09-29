@@ -7,8 +7,8 @@ class Booking:
         self.booking_id = booking_id
         self.customer_id = customer_id
         self.room_id = room_id
-        self.check_in_date = datetime.strptime(check_in_date, "%Y-%m-%d").day
-        self.check_out_date = datetime.strptime(check_out_date, "%Y-%m-%d").day
+        self.check_in_date = datetime.strptime(check_in_date, "%Y-%m-%d").date()
+        self.check_out_date = datetime.strptime(check_out_date, "%Y-%m-%d").date()
         self.total_price = total_price
         self.total_days = self.check_out_date - self.check_in_date
         self.services = services or []
@@ -80,6 +80,7 @@ class Booking:
             cursor.close()
             connection.close()
     
+    @classmethod
     def delete(self, booking_id):
         if booking_id:
             connection, cursor = connect_to_mysql()
