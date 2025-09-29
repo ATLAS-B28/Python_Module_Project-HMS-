@@ -1,31 +1,55 @@
 from mysql.connector import connect
 from mysql.connector import Error
 
+class DatabaseConnect:
+    _instance = None
+    _connection = None
+    _cursor = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+    
+    def get_connect(self):
+        if self._connection is None or not self._connection.is_connected():
+            try:
+                self._connection = connect(
+                    host="localhost",
+                    user="root",
+                    password="admin28",
+                    database="hotel_motel"
+                )
+                self._cursor = self._connection.cursor()
+            except Error as e:
+                print(f"Error connecting to MySQL database")
+                return None, None
+            return self._connection, self._cursor
+    
+    def close_connection(self):
+        if self._cursor:
+            self._cursor.close()
+        if self._connection and self._connection.is_connected():
+            self._connection.close()
+
+db = DatabaseConnect()
+
 def connect_to_mysql():
-    """
-    Establishes a connection to a MySQL database using the provided credentials.
+    return db.get_connect()
 
-    Args:
-    host (str): The hostname or IP address of the MySQL server.
-    user (str): The username for authentication.
-    password (str): The password for authentication.
-    database (str): The name of the database to connect to.
+def close_db_connection():
+    db.close_connection()
+                
 
-    Returns:
-    mysql.connector.connection.MySQLConnection: A connection object if the connection is successful.
 
-    Raises:
-    mysql.connector.Error: If there's an error during the connection attempt.
 
-    Example:
-    >>> conn = connect_to_mysql('localhost', 'user', 'password', 'mydatabase')
-    >>> type(conn)
-    <class 'mysql.connector.connection.MySQLConnection'>
-    """
+
+def connect_to_mysql():
+    
     try:
         connection = connect(
             host="localhost",
-            user="admin",
+            user="root",
             password="admin28",
             database="hotel_motel"
         )
