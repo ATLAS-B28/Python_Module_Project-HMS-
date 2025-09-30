@@ -44,7 +44,7 @@ def close_db_connection():
 
 
 
-def connect_to_mysql():
+'''def connect_to_mysql():
     
     try:
         connection = connect(
@@ -56,4 +56,4 @@ def connect_to_mysql():
         cursor = connection.cursor()
         return connection, cursor
     except Error as e:
-        raise Error(f"Error connecting to MySQL database: {e}")
+        raise Error(f"Error connecting to MySQL database: {e}")'''

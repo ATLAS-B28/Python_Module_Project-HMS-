@@ -5,6 +5,7 @@ from booking import Booking
 from room import Room
 from dbconfig import close_db_connection
 from datetime import datetime
+print("\t\t\t\t\t\t\t\tWelcome to Hotel Management System")
 print('''
 1) Customer data
       1. Add customer
@@ -13,10 +14,8 @@ print('''
       4. Delete customer
 2) Booking rooms
       1. Book rooms
-      2. Update booking
-      3. Add service
-      4. Get booking info
-      5. Cancel booking
+      2. Get booking info
+      3. Cancel booking
 3) Exit
 ''')
 # Customer
@@ -98,10 +97,8 @@ def customer_operations():
 def booking_operations():
     print('''
           1. Book rooms
-          2. Update booking
-          3. Add service
-          4. Get booking info
-          5. Cancel booking
+          2. Get booking info
+          3. Cancel booking
         ''')
 
     choice=int(input("Enter your choice: "))
@@ -155,10 +152,17 @@ def booking_operations():
         if choice_4==1:
             id=int(input("Enter booking id: "))
             result=Booking.get_by_id(id)
-            return f"Booking {id} details:\n"+result
+            if result:
+             return f"Booking {id} details:\n"+str(result)
+            else:
+             return f"Booking with id {id} not found"
         elif choice_4==2:
             result=Booking.get_all()
-            return f"Details of all bookings:\n"+result
+            if result:
+             bookings_str = "\n".join([str(booking) for booking in result])
+             return f"Details of all bookings:\n"+bookings_str
+            else:
+              return "No bookings found"
         else:
             return "Invalid choice"
     elif choice==3:

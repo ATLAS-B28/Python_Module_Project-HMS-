@@ -7,19 +7,31 @@ class Booking:
         self.booking_id = booking_id
         self.customer_id = customer_id
         self.room_id = room_id
-        self.check_in_date = datetime.strptime(check_in_date, "%Y-%m-%d").date()
-        self.check_out_date = datetime.strptime(check_out_date, "%Y-%m-%d").date()
+
+        if isinstance(check_in_date, str):
+         self.check_in_date = datetime.strptime(check_in_date, "%Y-%m-%d").date()
+        else:
+         self.check_in_date = check_in_date
+        
+        if isinstance(check_out_date, str):
+         self.check_out_date = datetime.strptime(check_out_date, "%Y-%m-%d").date()
+        else:
+         self.check_out_date = check_out_date
+
         self.total_days = self.check_out_date - self.check_in_date
         self.total_price = price * self.total_days.days
         self.no_of_guests = no_of_guests
+
+    def __str__(self):
+        return f"Booking ID: {self.booking_id}, Customer: {self.customer_id}, Room: {self.room_id}, Check-in: {self.check_in_date}, Check-out: {self.check_out_date}, Days: {self.total_days.days}, Total: ${self.total_price}, Guests: {self.no_of_guests}"
 
 
     def save(self):
         connection, cursor = connect_to_mysql()
         try:
             
-            query = "INSERT INTO booking (total_price, check_in_date, check_out_date, total_days, customer_id, room_id) VALUES (%s, %s, %s, %s, %s, %s)"
-            values = (self.total_price, self.check_in_date, self.check_out_date, self.total_days, self.customer_id, self.room_id)
+            query = "INSERT INTO booking (total_price, check_in, check_out, total_days, customer_id, room_id) VALUES (%s, %s, %s, %s, %s, %s)"
+            values = (self.total_price, self.check_in_date, self.check_out_date, self.total_days.days, self.customer_id, self.room_id)
             cursor.execute(query, values)
             self.booking_id = cursor.lastrowid
             connection.commit()
@@ -34,7 +46,7 @@ class Booking:
         connection, cursor = connect_to_mysql()
         try:
             query = "UPDATE booking SET total_price = %s, check_in = %s, check_out = %s, total_days = %s, customer_id = %s, room_id = %s WHERE booking_id = %s"
-            values = (self.total_price, self.check_in_date, self.check_out_date, self.total_days, self.customer_id, self.room_id, booking_id)
+            values = (self.total_price, self.check_in_date, self.check_out_date, self.total_days.days, self.customer_id, self.room_id, booking_id)
             cursor.execute(query, values)
             connection.commit()
         except Exception as e:
@@ -52,7 +64,15 @@ class Booking:
             cursor.execute(query, (booking_id,))
             res = cursor.fetchone()
             if res:
-                return cls(*res)
+                return cls(
+                customer_id=res[5], 
+                room_id=res[6], 
+                check_in_date=res[2], 
+                check_out_date=res[3], 
+                price=res[1]/res[4],  # total_price / total_days to get daily price
+                no_of_guests=None,  # Not stored in DB
+                booking_id=res[0]
+                )
             return None
         except Exception as e:
             connection.rollback()
@@ -68,7 +88,7 @@ class Booking:
             query = "SELECT * FROM booking"
             cursor.execute(query)
             res = cursor.fetchall()
-            return [cls(*result) for result in res]
+            return [cls(booking_id=result[0],price=result[1]/result[4],check_in_date=result[2], check_out_date=result[3], no_of_guests=None, customer_id=result[5], room_id=result[6]) for result in res]
         except Exception as e:
             connection.rollback()
             print(f"Error: {e}")
