@@ -114,7 +114,9 @@ def booking_operations():
         room_list=Room.get_available_rooms(check_in_date, check_out_date)
         if not room_list:
             return "No rooms available for the given dates. Please try different dates."
-        print(f"Available rooms: {room_list}")
+        print("Available rooms:")
+        for i, room in enumerate(room_list, 1):
+            print(f"{i}. {room}")
        
         room_id=int(input("Enter room id: "))
         room = Room.get_room_by_id(room_id)

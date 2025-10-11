@@ -30,7 +30,7 @@ class Booking:
         connection, cursor = connect_to_mysql()
         try:
             
-            query = "INSERT INTO booking (total_price, check_in, check_out, total_days, customer_id, room_id) VALUES (%s, %s, %s, %s, %s, %s)"
+            query = "INSERT INTO booking (total_price, check_in, check_out, total_days, customer_id, room_id) VALUES (%s, %s, %s, %s, %s, %s, %s)"
             values = (self.total_price, self.check_in_date, self.check_out_date, self.total_days.days, self.customer_id, self.room_id)
             cursor.execute(query, values)
             self.booking_id = cursor.lastrowid
@@ -70,7 +70,6 @@ class Booking:
                 check_in_date=res[2], 
                 check_out_date=res[3], 
                 price=res[1]/res[4],  # total_price / total_days to get daily price
-                no_of_guests=None,  # Not stored in DB
                 booking_id=res[0]
                 )
             return None
@@ -88,7 +87,7 @@ class Booking:
             query = "SELECT * FROM booking"
             cursor.execute(query)
             res = cursor.fetchall()
-            return [cls(booking_id=result[0],price=result[1]/result[4],check_in_date=result[2], check_out_date=result[3], no_of_guests=None, customer_id=result[5], room_id=result[6]) for result in res]
+            return [cls(booking_id=result[0],price=result[1]/result[4],check_in_date=result[2], check_out_date=result[3], customer_id=result[5], room_id=result[6]) for result in res]
         except Exception as e:
             connection.rollback()
             print(f"Error: {e}")
